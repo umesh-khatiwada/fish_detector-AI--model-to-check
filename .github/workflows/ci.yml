@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    environment: fish_detectore-model
 
     steps:
       - name: Checkout code
