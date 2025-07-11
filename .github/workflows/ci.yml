@@ -33,11 +33,11 @@ jobs:
         env:
           MODEL_URL: ${{ secrets.FISH_DETECTORE_URI }}
         run: |
-          if [ -n "$MODEL_URL" ]; then
-            curl -L "$MODEL_URL" -o model.pt
-          else
-            echo "MODEL_URL is not set. Skipping model.pt download."
+          if [ -z "$MODEL_URL" ]; then
+            echo "ERROR: MODEL_URL is not set. Please add the FISH_DETECTORE_URI secret to your repository or environment."
+            exit 1
           fi
+          curl -L "$MODEL_URL" -o model.pt
 
       - name: Run batch labeling pipeline
         run: |
