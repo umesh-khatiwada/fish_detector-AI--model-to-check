@@ -29,6 +29,16 @@ jobs:
         run: |
           pytest tests/
 
+      - name: Download model.pt from environment secret
+        env:
+          MODEL_URL: ${{ secrets.FISH_DETECTORE_URI }}
+        run: |
+          if [ -n "$MODEL_URL" ]; then
+            curl -L "$MODEL_URL" -o model.pt
+          else
+            echo "MODEL_URL is not set. Skipping model.pt download."
+          fi
+
       - name: Run batch labeling pipeline
         run: |
           mkdir -p images
@@ -38,9 +48,8 @@ jobs:
           echo '[{"model_idx": 1, "class_name": "fish"}]' > class_mapping.json
           # Create dummy transforms.json
           echo '{"transform": {"transforms": []}}' > transforms.json
-          # Create a dummy model.pt if needed (skipped here, as model loading is mocked in tests)
           # Run the pipeline (will fail if model.pt is required and not mocked)
-          python3 batch_label.py --images_dir images --class_mapping class_mapping.json --transforms transforms.json --output predictions_coco.json || true
+          python3 batch_label.py --images_dir images --model model.pt --class_mapping class_mapping.json --transforms transforms.json --output predictions_coco.json || true
 
       - name: Archive predictions
         if: always()
