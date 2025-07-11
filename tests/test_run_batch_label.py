@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 import types
 
 def setup_dummy_modules():
-    # Patch infra.model_inference with dummy functions
     dummy_module = types.ModuleType("infra.model_inference")
     dummy_module.run_inference = lambda model, image_np, device: {
         'pred_boxes': np.array([[10, 10, 50, 50]]),
@@ -33,15 +32,15 @@ def create_dummy_files(tmp_path):
     transforms_path = tmp_path / "transforms.json"
     with open(transforms_path, "w") as f:
         json.dump({"transform": {"transforms": []}}, f)
-
-    # Save output.json in the current working directory
     output_path = os.path.abspath("output.json")
     return images_dir, class_mapping_path, transforms_path, output_path
 
+# Test function for run_batch_label
+# This function will patch the necessary imports and create dummy files for the test cases to run.
+#Either we can we use unittest.mock.patch or we can create dummy modules but we are using dummy modules here.
 def test_run_batch_label(tmp_path):
     setup_dummy_modules()
     from app.use_cases.run_batch_label import run_batch_label
-
     images_dir, class_mapping_path, transforms_path, output_path = create_dummy_files(tmp_path)
 
     run_batch_label(
@@ -51,10 +50,7 @@ def test_run_batch_label(tmp_path):
         transforms_path=str(transforms_path),
         output_path=str(output_path)
     )
-
-    # Check if output file exists before opening
     assert os.path.exists(output_path), f"Output file {output_path} was not created."
-
     with open(output_path) as f:
         coco = json.load(f)
     assert coco["images"][0]["file_name"] == "test1.jpg"
