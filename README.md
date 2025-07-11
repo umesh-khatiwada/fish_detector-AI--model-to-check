@@ -54,6 +54,17 @@ The script will display the input image with predicted bounding boxes and class 
 
 # Fish Detector - Batch Labeling Pipeline
 
+## Multi-threaded Batch Inference
+
+The batch labeling pipeline uses **multi-threading** to speed up inference on large image batches. Each image is processed in a separate thread, allowing for parallel execution and improved throughput, especially when I/O or preprocessing is a bottleneck.
+
+**How it works:**
+- Each image is loaded and preprocessed in its own thread.
+- Inference is run in parallel for all images.
+- Results are collected and merged in the original order for COCO output.
+
+This approach is especially effective for CPU-bound or I/O-bound workloads, and is safe for PyTorch inference as long as the model is only used for reading (inference) and not training.
+
 ## Quickstart
 
 1. **Build the Docker image:**
@@ -74,7 +85,7 @@ The script will display the input image with predicted bounding boxes and class 
 
 - Deploys a Docker container for reproducible inference.
 - Applies image augmentations as specified in `transforms.json`.
-- Runs inference using the TorchScript model.
+- **Runs inference using multi-threading for faster batch processing.**
 - Outputs predictions in COCO format.
 - Container is removed after completion.
 
