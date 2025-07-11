@@ -89,6 +89,21 @@ This approach is especially effective for CPU-bound or I/O-bound workloads, and 
 - Outputs predictions in COCO format.
 - Container is removed after completion.
 
+## GitHub Actions Note
+
+If you use the provided GitHub Actions pipeline, update the artifact upload step to use the latest version:
+
+```yaml
+- name: Archive predictions
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: predictions
+    path: predictions_coco.json
+```
+
+See [GitHub Changelog](https://github.blog/changelog/2024-04-16-deprecation-notice-v3-of-the-artifact-actions/) for details.
+
 ## Files
 
 - `batch_label.py`: Batch labeling script.
